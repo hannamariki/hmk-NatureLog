@@ -36,7 +36,7 @@ export default function Login({navigation}) {
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry // kun kentän arvo on true, tällä piilotetaan salasanan syöttäminen ja tilalle laitetaan tähtiä ****
       />
       <Button title="Login" onPress={handleLogin} />
       
