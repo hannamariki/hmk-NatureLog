@@ -12,8 +12,9 @@ export default function Login({navigation}) {
 
   const handleLogin = async () => { //funktio jolla käsitellään kirjautumista
     try {
-      await signInWithEmailAndPassword(auth, email, password); //kutsutaan Firebase Authenticationin signInWithEmailAndPassword-metodia, joka yrittää kirjautua siään sähköpostilla ja salasanalla
-      console.log('User signed in');
+        await signInWithEmailAndPassword(auth, email, password); //kutsutaan Firebase Authenticationin signInWithEmailAndPassword-metodia, joka yrittää kirjautua siään sähköpostilla ja salasanalla
+        console.log('User signed in');
+        navigation.navigate('Map');
     } catch (error) {
       console.error('Error signing in:', error);
     }
