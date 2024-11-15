@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, TextInput, Button } from 'react-native'; 
 import MapView, { Marker } from 'react-native-maps'; 
 import * as Location from 'expo-location';
+import { IconButton } from 'react-native-paper';
+import AddObservation from './AddObservation'; 
 
 export default function App() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
@@ -10,6 +12,7 @@ export default function App() {
     longitude: null,
   });
   const [positioning, setPositioning] = useState(null); //tila, jonne tallennetaan sijainnin tarkemmat tiedot 
+  const [isModalVisible, setModalVisible] = useState(false);
 
   // Hakee sijainnin ja asettaa sen tilaan
   const gePositioning = async () => {
@@ -67,6 +70,10 @@ export default function App() {
 
   const mapViewRef = React.createRef(); //referenssi eli Reactin sisäänrakennettu tapa viitata komponenttiin suoraan.
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   return (
     <View style={styles.container}>
       {address.longitude && address.latitude && (
@@ -92,6 +99,16 @@ export default function App() {
       <View style={styles.inputContainer}>
         <Button title="Center Location" onPress={centerLocation} />
       </View>
+
+      <View style={styles.addObservationContainer}>
+        <IconButton
+          icon="pencil" 
+          size={30}
+          onPress={toggleModal}
+          color="#000" 
+        />
+    </View>
+    <AddObservation isModalVisible={isModalVisible} toggleModal={toggleModal} />
     </View>
   );
 }
@@ -107,5 +124,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     padding: 10,
+  },
+  addObservationContainer: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    zIndex: 10, 
   },
 });

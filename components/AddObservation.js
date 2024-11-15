@@ -1,31 +1,22 @@
 import React, { useState } from 'react';
-import { Button, View} from 'react-native-paper';
+import { Button, View, Text} from 'react-native-paper';
 import Modal from 'react-native-modal';
 
-export default function AddObservation ({navigation}){
 
-    const Modal = () =>{
-        const [isModalVisible, setModalVisible] = useState(false); //https://github.com/react-native-modal/react-native-modal
-
-        const toggleModal = () => {
-          setModalVisible(!isModalVisible);
-        };
+export default function AddObservation ({isModalVisible, toggleModal}){
 
         return (
-            <View style={{ flex: 1 }}>
-              <Button title="Show modal" onPress={toggleModal} />
-        
-              <Modal isVisible={isModalVisible}>
-                <View style={{ flex: 1 }}>
-                  <Text>Hello!</Text>
-        
-                  <Button title="Hide modal" onPress={toggleModal} />
-                </View>
-              </Modal>
+            <Modal
+            visible={isModalVisible}
+            onRequestClose={toggleModal}
+            animationType="slide"
+          >
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text>Add your observation</Text>
+              <Button title="Close" onPress={toggleModal} />
             </View>
-          );
-        }
+          </Modal>
+        );
+      }
 
-    }
-
-
+         //https://github.com/react-native-modal/react-native-modal
