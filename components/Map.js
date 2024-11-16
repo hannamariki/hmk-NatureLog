@@ -5,6 +5,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { IconButton, Modal } from 'react-native-paper';
 import AddObservation from './AddObservation'; 
+import { saveObservation } from './firebase';
 
 export default function Map() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
@@ -38,7 +39,7 @@ export default function Map() {
       const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
       const data = await response.json();
 
-      if (data.status === 'OK' && data.results.length > 0) { //tarkistetaan onko API kutsu käsitellyt pyynnön onnistuneesti ja palauttanut utloksia
+      if (data.status === 'OK' && data.results.length > 0) { //tarkistetaan onko API kutsu käsitellyt pyynnön onnistuneesti ja palauttanut tuloksia
         const address = data.results[0].formatted_address; //kun tulokset on löytyneet, poimitaan ensimmäinen tulos ja muotoillaan siitä osoite. results on osoitteet sisältävä taulukko
        //formatted_address on valmis osoite
         Alert.alert('Address found:', address);
@@ -74,8 +75,10 @@ export default function Map() {
     setModalVisible(!isModalVisible);
   };
 
-  const handleSave = (observation) => { //tallennetaan havainto
+  //tallennetaan havainto
+  const handleSave = (observation) => { 
     console.log('Havainto tallennettu:', observation);
+    saveObservation(observation); //kutsutaan firebase.js komponentissa olevaa tallennustilaa
     setModalVisible(false); // Suljetaan modal
   };
 

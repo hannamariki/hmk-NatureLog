@@ -23,6 +23,7 @@ const db = getFirestore(app);
 
 
 
+
 //Rekisteröityminen
 export const registerUser = async (email, password) => { //asynkroninen funktio, jolla luodaan uusi käyttäjä
     try {
@@ -74,4 +75,4 @@ const saveObservation = async (observation) => { //tallentaa uuden havainnon
     }
 }; //Get multiple documents from a collection avulla pitäisi näkyä kaikki havainnot kartalla, ei vain yksi havainto
 
-export { auth, db };
+export { auth, db, saveObservation };
