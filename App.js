@@ -7,7 +7,7 @@ import { auth } from './components/firebase';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Map from './components/Map';
-
+import AddObservation from './components/AddObservation';
 
 
 const Stack = createStackNavigator(); 

@@ -3,16 +3,16 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, TextInput, Button } from 'react-native'; 
 import MapView, { Marker } from 'react-native-maps'; 
 import * as Location from 'expo-location';
-import { IconButton } from 'react-native-paper';
+import { IconButton, Modal } from 'react-native-paper';
 import AddObservation from './AddObservation'; 
 
-export default function App() {
+export default function Map() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
     latitude: null,
     longitude: null,
   });
   const [positioning, setPositioning] = useState(null); //tila, jonne tallennetaan sijainnin tarkemmat tiedot 
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);//Modalain tila
 
   // Hakee sijainnin ja asettaa sen tilaan
   const gePositioning = async () => {
@@ -70,8 +70,13 @@ export default function App() {
 
   const mapViewRef = React.createRef(); //referenssi eli Reactin sisäänrakennettu tapa viitata komponenttiin suoraan.
 
-  const toggleModal = () => {
+  const toggleModal = () => { //tällä hallitaan Modaalin näkymää
     setModalVisible(!isModalVisible);
+  };
+
+  const handleSave = (observation) => { //tallennetaan havainto
+    console.log('Havainto tallennettu:', observation);
+    setModalVisible(false); // Suljetaan modal
   };
 
   return (
@@ -108,7 +113,16 @@ export default function App() {
           color="#000" 
         />
     </View>
-    <AddObservation isModalVisible={isModalVisible} toggleModal={toggleModal} />
+    <Modal
+        visible={isModalVisible}
+        onDismiss={() => setModalVisible(false)}  // Suljetaan modal
+        animationType="slide"
+      >
+        <AddObservation 
+          onSave={handleSave} 
+          onClose={() => setModalVisible(false)} 
+        />
+           </Modal>
     </View>
   );
 }

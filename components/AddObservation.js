@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
-import { Button, View, Text} from 'react-native-paper';
-import Modal from 'react-native-modal';
+import React, {useState} from 'react';
+import { TextInput, Button, } from 'react-native-paper';
+import { View, StyleSheet} from 'react-native';
 
 
-export default function AddObservation ({isModalVisible, toggleModal}){
+const AddObservation = ({ onSave, onClose }) => {
+  const [name, setName] = useState('');  // Havainnon nimi
 
-        return (
-            <Modal
-            visible={isModalVisible}
-            onRequestClose={toggleModal}
-            animationType="slide"
-          >
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text>Add your observation</Text>
-              <Button title="Close" onPress={toggleModal} />
-            </View>
-          </Modal>
-        );
-      }
+  const handleSave = () => {
+    const observation = { name };
+    onSave(observation);  // Kutsutaan onSave-funktiota (Map.js komponentista)
+  };
 
-         //https://github.com/react-native-modal/react-native-modal
+  return (
+    <View style={styles.form}>
+      <TextInput
+        label="Nimi"
+        value={name}
+        onChangeText={setName}
+        style={styles.input}
+      />
+      
+      <Button mode="contained" onPress={handleSave}>
+        Tallenna
+      </Button>
+      <Button mode="text" onPress={onClose}>
+        Peruuta
+      </Button>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  form: {
+    padding: 20,
+  },
+  input: {
+    marginBottom: 12,
+  },
+});
+
+export default AddObservation;
