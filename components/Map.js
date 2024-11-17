@@ -77,8 +77,17 @@ export default function Map() {
 
   //tallennetaan havainto
   const handleSave = (observation) => { 
-    console.log('Havainto tallennettu:', observation);
-    saveObservation(observation); //kutsutaan firebase.js komponentissa olevaa tallennustilaa
+    if (!observation.name || !observation.icon) {
+      Alert.alert('Virhe', 'Havaintotiedot ovat puutteelliset');
+      return;
+    }
+    //console.log('Havainto tallennettu:', observation);
+    try {
+      saveObservation(observation);
+      setModalVisible(false); // Sulje modal onnistuneen tallennuksen jälkeen
+    } catch (error) {
+      Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + error.message);
+    } //kutsutaan firebase.js komponentissa olevaa tallennustilaa
     setModalVisible(false); // Suljetaan modal
   };
 
