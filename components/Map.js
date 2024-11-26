@@ -81,7 +81,7 @@ export default function Map() {
       Alert.alert('Virhe', 'Havaintotiedot ovat puutteelliset');
       return;
     }
-    //console.log('Havainto tallennettu:', observation);
+     
     try {
       saveObservation(observation);
       setModalVisible(false); // Sulje modal onnistuneen tallennuksen jälkeen
@@ -133,6 +133,8 @@ export default function Map() {
         <AddObservation 
           onSave={handleSave} 
           onClose={() => setModalVisible(false)} 
+          latitude = {address.latitude}
+          longitude = {address.longitude}
         />
            </Modal>
     </View>

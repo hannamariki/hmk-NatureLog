@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, Button, Paragraph, TouchableRipple } from 'react-native-paper';
+import { TextInput, Button, Paragraph, TouchableRipple, IconButton } from 'react-native-paper';
 import { View, StyleSheet, Text, Modal } from 'react-native';
 
 // Ikonivaihtoehdot https://unicode.org/emoji/charts/full-emoji-list.html#1face
@@ -20,23 +20,35 @@ const iconOptions = [
 ];
 
 
-const AddObservation = ({ onSave, onClose, isVisible }) => {
+
+const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => {
   const [name, setName] = useState('');  // Havainnon nimi
-  const [icon, setIcon] = useState('🐾'); // Oletusikoni (eläimen jälki)
+  const [icon, setIcon] = useState('Lisää kuvake'); // Oletusikoni (eläimen jälki)
   const [description, setDescription] = useState('');  // Kuvaus
   const [iconModalVisible, setIconModalVisible] = useState(false); // Ikonilistan ikkunavalikko
   const [descriptionModalVisible, setDescriptionModalVisible] = useState(false);
   const [folder, setFolder] = useState(''); // Kansio
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [newFolder, setNewFolder] = useState('');
+  const [existingFolders, setExistingFolders] = useState(['']);
 
   const handleSave = () => {
-    const observation = { name, icon, description };
+    const observation = { name, icon, description, folder };
     onSave(observation);  // Kutsutaan onSave-funktiota (Map.js-komponentista)
     setIconModalVisible(false); // Sulje kuvakkeen valinta
     setDescriptionModalVisible(false);
     setFolderModalVisible(false); 
   };
+
+  const handleFolder = () => {
+    if (newFolder){
+      existingFolders.push(newFolder);
+      setFolder(newFolder);
+      setNewFolder('');
+      setFolderModalVisible(false); //suljetaan kansio
+
+    }
+  }
 
   return (
     <Modal visible={isVisible} transparent={true}> 
@@ -50,22 +62,51 @@ const AddObservation = ({ onSave, onClose, isVisible }) => {
           />
 
            {/* Valitaan ikoni */}
-          <Paragraph>Kuvake</Paragraph>
+          <Paragraph>
+          <IconButton 
+              icon="paw" 
+              size={20} 
+              onPress={() => setIconModalVisible(true)} 
+            />
+            Kuva</Paragraph>
           <TouchableRipple style={styles.iconButton} onPress={() => setIconModalVisible(true)}>
-            <Text style={styles.icon}>{icon}</Text>
+            <Text style={styles.descriptionText}>{icon}</Text>
           </TouchableRipple>
 
           {/*Kirjoitetaan havaintoon kuvaus */}
-          <Paragraph> Kuvaus </Paragraph>
+          <Paragraph > 
+          <IconButton 
+              icon="pencil" 
+              size={20} 
+              onPress={() => setDescriptionModalVisible(true)} 
+            />
+        
+            Kuvaus </Paragraph>
           <TouchableRipple style={styles.iconButton} onPress={()=> setDescriptionModalVisible(true)}>
             <Text style={styles.descriptionText}>{description || 'Lisää kuvaus'}</Text>
           </TouchableRipple>
 
           {/* Kansiolle nimi */}
-          <Paragraph>Kansio </Paragraph>
+          <Paragraph >
+          <IconButton 
+              icon="folder" 
+              size={20} 
+              onPress={() => setFolderModalVisible(true)} 
+            />
+            Kansio </Paragraph>
           <TouchableRipple style={styles.iconButton} onPress={() => setFolderModalVisible(true)}>
-          <Text style={styles.icon}>{folder || 'Kansion valinta'}</Text>
+          <Text style={styles.descriptionText}>{folder || 'Valitse kansio'}</Text>
           </TouchableRipple>
+
+          {/*Koordinaatit */}
+          <Paragraph style={styles.paragraph}>
+             <IconButton 
+              icon="map-marker"
+              size={20}
+              onPress={() => setFolderModalVisible(true)} 
+              />
+            Koordinaatit: {latitude}, {longitude}
+          </Paragraph>
 
 
           <Button mode="contained" onPress={handleSave}>
@@ -158,6 +199,13 @@ const AddObservation = ({ onSave, onClose, isVisible }) => {
               onChangeText={setNewFolder}
               style={styles.input}
             />
+            <Button mode="contained" onPress={handleFolder}>
+              Luo kansio
+            </Button>
+
+            <Button mode = "text" onPress={() => setFolderModalVisible(false)}>
+              Sulje
+            </Button>
                </View>
         </View>
       </Modal>
@@ -180,16 +228,19 @@ const styles = StyleSheet.create({
     width: '80%',
     borderRadius: 10,
     elevation: 5,
+  
   },
   input: {
-    marginBottom: 12,
+    fontSize: 14,
+    marginBottom: 30,
   },
   icon: {
-    fontSize: 30,
+    fontSize: 27
+    ,
   },
   iconButton: {
     marginTop: 5,
-    padding: 20,
+    padding: 10,
   },
   iconList: {
     flexDirection: 'row',  
@@ -198,31 +249,37 @@ const styles = StyleSheet.create({
   },
   iconItem: {
     margin: 10,
-    padding: 20,
+    padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconModalContent: {
     backgroundColor: '#fff',
-    padding: 20,
+    padding: 10,
     width: '80%',
     borderRadius: 10,
     elevation: 5,
   },
   modalHeader: {
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 4,
     textAlign: 'center',
   },
   descriptionInput: {
     height: 120, 
     fontSize: 14,
-    marginBottom: 12,
+    marginBottom: 20,
   },
   descriptionText:{
     fontSize: 14,
-  
+    marginBottom: 30,
+    color: '#808080',
   },
+  paragraph:{
+    marginBottom: 20,
+  }
+  
+
 });
 
 export default AddObservation;
