@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextInput, Button, Paragraph, TouchableRipple, IconButton } from 'react-native-paper';
 import { View, StyleSheet, Text, Modal } from 'react-native';
+import { saveObservation } from './firebase';
 
 // Ikonivaihtoehdot https://unicode.org/emoji/charts/full-emoji-list.html#1face
 const iconOptions = [
@@ -8,6 +9,7 @@ const iconOptions = [
   { label: 'Jänis', value: '🐇' },
   { label: 'Villisika', value: '🐗' },
   { label: 'Kettu', value: '🦊' },
+  {labl: 'Susi', value: '🐺'},
   { label: 'Karhu', value: '🐻' },
   { label: 'Mäyrä', value: '🦡' },
   { label: 'Hirvi', value: '🫎' },
@@ -21,7 +23,7 @@ const iconOptions = [
 
 
 
-const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => {
+const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude, route }) => {
   const [name, setName] = useState('');  // Havainnon nimi
   const [icon, setIcon] = useState('Lisää kuvake'); // Oletusikoni (eläimen jälki)
   const [description, setDescription] = useState('');  // Kuvaus
@@ -31,10 +33,31 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [newFolder, setNewFolder] = useState('');
   const [existingFolders, setExistingFolders] = useState(['']);
+  const {observation} = route.params || {};
 
-  const handleSave = () => {
-    const observation = { name, icon, description, folder };
-    onSave(observation);  // Kutsutaan onSave-funktiota (Map.js-komponentista)
+  const handleSave = async () => {
+    if (!latitude || !longitude) {
+      Alert.alert('Virhe', 'Koordinaatit puuttuvat');
+      return;
+    }
+
+    const observation = { 
+      name,
+      icon : icon || '⭕', 
+      description, 
+      folder, 
+      latitude, 
+      longitude };
+
+    try{
+      await saveObservation(observation);
+      console.log("Observation saved")
+      onSave(observation);  // Kutsutaan onSave-funktiota (Map.js-komponentista)
+      onClose();
+    }catch (e) {
+      console.error("Error saving observation: ", e);
+    }
+    
     setIconModalVisible(false); // Sulje kuvakkeen valinta
     setDescriptionModalVisible(false);
     setFolderModalVisible(false); 

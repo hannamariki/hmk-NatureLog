@@ -49,10 +49,19 @@ const loginUser = async (email, password) => {//kirjaa käyttäjän sisään sä
 //Havainnon tallentaminen Cloud Firestoreen
 const saveObservation = async (observation) => { //tallentaa uuden havainnon 
     try {
-        const docRef = await addDoc(collection(db, "observations"), observation); 
+        const docRef = await addDoc(collection(db, "observations"), {
+            name: observation.name,
+            description: observation.description,
+            icon: observation.icon,
+            folder: observation.folder,
+            latitude: observation.latitude, // Lisätään koordinaatit
+            longitude: observation.longitude, 
+
+        }); 
         // addDoc lisää uuden dokumentin tietokantaan ja luo automaattisesti id:n dokumentille https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
         //collection(db, "observations") tämä määrittää mihin kokoelmaan dokumentti lisätään, ja mikä on kokoelman nimi ("observations")
         //observation sisältää havaintotiedot
+
         
         console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -68,13 +77,18 @@ const saveObservation = async (observation) => { //tallentaa uuden havainnon
         const querySnapshot = await getDocs(collection(db, "observations"));
         //getDoc hakee kaikki dokumentit observations kokoelmasta https://firebase.google.com/docs/firestore/query-data/get-data#get_multiple_documents_from_a_collection
         //  querySnapshot sisältää kaikki haetut objektit
+        const data = [];
         querySnapshot.forEach((doc) => {
             //forEach käy läpi kaikki dokumentit ja tulostaa niidet id:t ja datan
-            console.log(doc.id, " => ", doc.data());
+           data.push({id: doc.id, ...doc.data() });
         });
+       
+        return data;
+
     }catch (e) {
         console.error("Error getting documents: ", e);
+        return [];
     }
 }; //Get multiple documents from a collection avulla pitäisi näkyä kaikki havainnot kartalla, ei vain yksi havainto
 
-export { auth, db, saveObservation };
+export { auth, db, saveObservation, getObservation };

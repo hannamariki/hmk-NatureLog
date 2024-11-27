@@ -1,11 +1,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react'; 
-import { StyleSheet, View, Alert, TextInput, Button } from 'react-native'; 
+import { StyleSheet, View, Alert, TextInput, Button, Text } from 'react-native'; 
 import MapView, { Marker } from 'react-native-maps'; 
 import * as Location from 'expo-location';
 import { IconButton, Modal } from 'react-native-paper';
 import AddObservation from './AddObservation'; 
-import { saveObservation } from './firebase';
+import { saveObservation, getObservation } from './firebase';
 
 export default function Map() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
@@ -14,6 +14,7 @@ export default function Map() {
   });
   const [positioning, setPositioning] = useState(null); //tila, jonne tallennetaan sijainnin tarkemmat tiedot 
   const [isModalVisible, setModalVisible] = useState(false);//Modalain tila
+  const [observations, setObservations] = useState([]); //tila havaintojen tallentamiseen
 
   // Hakee sijainnin ja asettaa sen tilaan
   const gePositioning = async () => {
@@ -56,6 +57,20 @@ export default function Map() {
     gePositioning();
   }, []);
 
+  //haetaan havainnot Firebasesta
+  useEffect(() => {
+    const loadObservations = async () => {
+      try {
+       const data = await getObservation();
+       setObservations(data);
+      }catch (error) {
+        console.error("Error fetching observations: ", error);
+       }
+      };
+      loadObservations();
+    }, []); //hataan havainto vain kerran
+  
+
 
 //Keskittää kartan käyttäjän nykyiseen sijaintiin
   const centerLocation = () => {
@@ -83,7 +98,11 @@ export default function Map() {
     }
      
     try {
-      saveObservation(observation);
+      saveObservation({
+        ...observation,
+        latitude: address.latitude,
+        longitude: address.longitude,
+      });
       setModalVisible(false); // Sulje modal onnistuneen tallennuksen jälkeen
     } catch (error) {
       Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + error.message);
@@ -104,6 +123,7 @@ export default function Map() {
             longitudeDelta: 0.0221
           }}
         >
+          {/*Nykyinen sijainti */}
           <Marker
             coordinate={{
               latitude: address.latitude,
@@ -111,6 +131,30 @@ export default function Map() {
             }}
            
           />
+          {/*Havainnot kartalla */}
+          {observations.map((observation) =>(
+            observation.latitude && observation.longitude && (
+            <Marker
+            key={observation.id}
+            coordinate ={{
+              latitude: observation.latitude,
+              longitude: observation.longitude,
+            }}
+            zIndex={1} //määrittää järjestyksen, jotta saadaan iconi näkyviin
+            
+            title={observation.name}//näyttää tietolaatikon, jossa on nimi
+            description={observation.description}//ja havintoteksti
+          
+            
+            >
+
+              <View>
+                <Text style={{ fontSize: 25 }}>{observation.icon}</Text>
+                
+              </View>
+            </Marker>
+            )
+          ))}
         </MapView>
       )}
       <View style={styles.inputContainer}>
