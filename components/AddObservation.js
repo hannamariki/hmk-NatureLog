@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { TextInput, Button, Paragraph, TouchableRipple, IconButton } from 'react-native-paper';
-import { View, StyleSheet, Text, Modal } from 'react-native';
+import { View, Text, Modal } from 'react-native';
 import { saveObservation } from './firebase';
+import {styles} from './Styles';
 
 // Ikonivaihtoehdot https://unicode.org/emoji/charts/full-emoji-list.html#1face
 const iconOptions = [
@@ -23,7 +24,7 @@ const iconOptions = [
 
 
 
-const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude, route }) => {
+const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => {
   const [name, setName] = useState('');  // Havainnon nimi
   const [icon, setIcon] = useState('Lisää kuvake'); // Oletusikoni (eläimen jälki)
   const [description, setDescription] = useState('');  // Kuvaus
@@ -33,7 +34,7 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude, route
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [newFolder, setNewFolder] = useState('');
   const [existingFolders, setExistingFolders] = useState(['']);
-  const {observation} = route.params || {};
+
 
   const handleSave = async () => {
     if (!latitude || !longitude) {
@@ -238,71 +239,5 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude, route
 };
 
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Puoli läpinäkyvä tausta
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    width: '80%',
-    borderRadius: 10,
-    elevation: 5,
-  
-  },
-  input: {
-    fontSize: 14,
-    marginBottom: 30,
-  },
-  icon: {
-    fontSize: 27
-    ,
-  },
-  iconButton: {
-    marginTop: 5,
-    padding: 10,
-  },
-  iconList: {
-    flexDirection: 'row',  
-    flexWrap: 'wrap',     
-    justifyContent: 'space-around', 
-  },
-  iconItem: {
-    margin: 10,
-    padding: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconModalContent: {
-    backgroundColor: '#fff',
-    padding: 10,
-    width: '80%',
-    borderRadius: 10,
-    elevation: 5,
-  },
-  modalHeader: {
-    fontSize: 14,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  descriptionInput: {
-    height: 120, 
-    fontSize: 14,
-    marginBottom: 20,
-  },
-  descriptionText:{
-    fontSize: 14,
-    marginBottom: 30,
-    color: '#808080',
-  },
-  paragraph:{
-    marginBottom: 20,
-  }
-  
-
-});
 
 export default AddObservation;

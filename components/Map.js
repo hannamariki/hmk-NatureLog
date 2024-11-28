@@ -6,6 +6,7 @@ import * as Location from 'expo-location';
 import { IconButton, Modal } from 'react-native-paper';
 import AddObservation from './AddObservation'; 
 import { saveObservation, getObservation } from './firebase';
+import EditObservation from './EditObservation';
 
 export default function Map() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
@@ -13,8 +14,10 @@ export default function Map() {
     longitude: null,
   });
   const [positioning, setPositioning] = useState(null); //tila, jonne tallennetaan sijainnin tarkemmat tiedot 
-  const [isModalVisible, setModalVisible] = useState(false);//Modalain tila
+  const [isModalVisible, setModalVisible] = useState(false);//AddObservationi modalain tila
   const [observations, setObservations] = useState([]); //tila havaintojen tallentamiseen
+  const [isEditModalVisible, setEditModalVisible] = useState(false); //EditObservation modalin tila
+  const [selectObservation, setSelectObservation] = useState(null);
 
   // Hakee sijainnin ja asettaa sen tilaan
   const gePositioning = async () => {
@@ -107,7 +110,7 @@ export default function Map() {
     } catch (error) {
       Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + error.message);
     } //kutsutaan firebase.js komponentissa olevaa tallennustilaa
-    setModalVisible(false); // Suljetaan modal
+    setModalVisible(false); 
   };
 
   return (
@@ -144,8 +147,11 @@ export default function Map() {
             
             title={observation.name}//näyttää tietolaatikon, jossa on nimi
             description={observation.description}//ja havintoteksti
-          
-            
+            onPress={()=>{
+              setSelectObservation(observation);
+              setModalVisible(false);
+              setEditModalVisible(true);
+            }}
             >
 
               <View>
@@ -155,6 +161,7 @@ export default function Map() {
             </Marker>
             )
           ))}
+
         </MapView>
       )}
       <View style={styles.inputContainer}>
@@ -180,7 +187,22 @@ export default function Map() {
           latitude = {address.latitude}
           longitude = {address.longitude}
         />
+        </Modal>
+
+        <Modal
+
+          visible={isEditModalVisible}
+          onDismiss={() => setEditModalVisible(false)}
+          animationType="slide"
+          >
+        <EditObservation
+        visible={isEditModalVisible}
+        onClose={() => setEditModalVisible(false)}
+        observation={selectObservation}
+        />
            </Modal>
+
+
     </View>
   );
 }
