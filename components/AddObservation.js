@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, Button, Paragraph, TouchableRipple, IconButton } from 'react-native-paper';
 import { View, Text, Modal } from 'react-native';
-import { saveObservation } from './firebase';
+import { saveObservation, saveFolder, getFolders } from './firebase';
 import {styles} from './Styles';
 
 // Ikonivaihtoehdot https://unicode.org/emoji/charts/full-emoji-list.html#1face
@@ -10,7 +10,7 @@ const iconOptions = [
   { label: 'Jänis', value: '🐇' },
   { label: 'Villisika', value: '🐗' },
   { label: 'Kettu', value: '🦊' },
-  {labl: 'Susi', value: '🐺'},
+  {label: 'Susi', value: '🐺'},
   { label: 'Karhu', value: '🐻' },
   { label: 'Mäyrä', value: '🦡' },
   { label: 'Hirvi', value: '🫎' },
@@ -33,7 +33,7 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => 
   const [folder, setFolder] = useState(''); // Kansio
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [newFolder, setNewFolder] = useState('');
-  const [existingFolders, setExistingFolders] = useState(['']);
+  const [existingFolders, setExistingFolders] = useState([]);
 
 
   const handleSave = async () => {
@@ -64,15 +64,31 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => 
     setFolderModalVisible(false); 
   };
 
-  const handleFolder = () => {
+    // Lataa kansiot Firebase-tietokannasta, kun komponentti ladataan
+    useEffect(() => {
+      const fetchFolders = async () => {
+        const folders = await getFolders();
+        setExistingFolders(folders);
+      };
+  
+      fetchFolders();
+    }, []); // Lataa kansiot vain kerran
+
+  const handleFolder = async () => {
     if (newFolder){
-      existingFolders.push(newFolder);
+      try {
+        await saveFolder(newFolder);
+      const updatedFolders = [...existingFolders, newFolder];
+      setExistingFolders(updatedFolders);
       setFolder(newFolder);
       setNewFolder('');
       setFolderModalVisible(false); //suljetaan kansio
+    } catch (e) {
+      console.error("Error saving folder: ", e);
+    }
 
     }
-  }
+  };
 
   return (
     <Modal visible={isVisible} transparent={true}> 
@@ -211,7 +227,7 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => 
                   setFolderModalVisible(false); // Suljetaan valintaikkuna
                 }}
               >
-                <Text style={styles.icon}>{folderName}</Text>
+                <Text style={styles.descriptionText}>{folderName}</Text>
               </TouchableRipple>
             ))}
           </View>

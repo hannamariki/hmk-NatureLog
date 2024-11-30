@@ -6,8 +6,8 @@ import * as Location from 'expo-location';
 import { IconButton, Modal } from 'react-native-paper';
 import AddObservation from './AddObservation'; 
 import { saveObservation, getObservation } from './firebase';
-//import EditObservation from './EditObservation';
 import ShowObservation from './ShowObservation';
+import { styles } from './Styles';
 
 export default function Map() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
@@ -97,6 +97,8 @@ export default function Map() {
 
   return (
     <View style={styles.container}>
+      
+      <Text style={styles.headerText}>NatureLog</Text>
       {address.longitude && address.latitude && (
         <MapView
         ref={mapViewRef} //viittaus
@@ -146,18 +148,24 @@ export default function Map() {
 
         </MapView>
       )}
-      <View style={styles.inputContainer}>
-        <Button title="Center Location" onPress={centerLocation} />
-      </View>
-
-      <View style={styles.addObservationContainer}>
+     <View style={styles.buttonRow}>
         <IconButton
-          icon="pencil" 
+          icon="pencil"
           size={30}
           onPress={toggleModal}
-          color="#000" 
+          color="#000"
+          style={styles.iconButton}
         />
-    </View>
+        <IconButton
+          icon="map-marker"
+          size={30}
+          onPress={centerLocation}
+          color="#000"
+          style={styles.iconButton}
+        />
+      </View>
+
+
     <Modal
         visible={isModalVisible}
         onDismiss={() => setModalVisible(false)}  // Suljetaan modal
@@ -187,24 +195,5 @@ export default function Map() {
 
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inputContainer: {
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    padding: 10,
-  },
-  addObservationContainer: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    zIndex: 10, 
-  },
-});

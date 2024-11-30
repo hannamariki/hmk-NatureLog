@@ -2,10 +2,22 @@ import React from 'react';
 import {Modal, Text, View} from 'react-native';
 import {styles} from './Styles';
 import { Paragraph, Button } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
-const EditObservation = ({visible, observation, onClose}) => {
+
+const ShowObservation = ({visible, observation, onClose}) => {
+    const navigation = useNavigation();
+
 if(!observation) return null;
 
+const onDelete = async (observationId) => {
+    try {
+      await deleteObservation(observationId); 
+      console.log('Havainto poistettu');
+    } catch (e) {
+      console.error('Virhe poistaessa havaintoa:', e);
+    }
+  };
 
 return (
 <Modal visible={visible} transparent={true} animationType="slide">
@@ -21,15 +33,27 @@ return (
             <Text style={styles.descriptionText}> {observation.folder}</Text>
             <Paragraph>Koordinaatit:</Paragraph>
             <Text style={styles.descriptionText}>{observation.latitude}, {observation.longitude}</Text>
+
+            <Button
+                mode="text"
+                onPress={() => { 
+                navigation.navigate('EditObservation', { id: observation});
+                }}
+                >
+                Muokkaa
+                </Button>
+            <Button mode="outlined" onPress={() => onDelete(observation.id)}>
+                Poista
+            </Button>
             <Button mode="text" onPress={onClose}>
                 Sulje
-                </Button>
+            </Button>
             </View>  
     </View>
 </Modal>
 );
 };
 
-export default EditObservation;
+export default ShowObservation;
 
 

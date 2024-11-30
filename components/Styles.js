@@ -63,6 +63,18 @@ export const styles = StyleSheet.create({
       },
       paragraph:{
         marginBottom: 20,
-      }
-      
+      },
+      buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        paddingVertical: 10,
+      },
+      headerText: {
+        textAlign: 'center',
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginVertical: 10,
+        color: '#000',
+      },
     });

@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -66,4 +66,36 @@ const saveObservation = async (observation) => { //tallentaa uuden havainnon
     }
 }; //Get multiple documents from a collection avulla pitäisi näkyä kaikki havainnot kartalla, ei vain yksi havainto
 
-export { db, saveObservation, getObservation };
+export const saveFolder = async (folderName) => {
+  try {
+    const docRef = await addDoc(collection(db, 'folders'), { name: folderName });
+    console.log("Folder saved with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error saving folder: ", e);
+  }
+};
+
+// Hae kaikki kansiot Firebase-tietokannasta
+export const getFolders = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'folders'));
+    const folders = querySnapshot.docs.map(doc => doc.data().name);
+    return folders; // Palauta kansioiden nimet
+  } catch (e) {
+    console.error("Error fetching folders: ", e);
+    return [];
+  }
+};
+
+//Olemassa olevien havaintojen päivittäminen
+const updateObservation = async (observationId, updatedData) => {
+  try {
+      const observationRef = doc(db, "observations", observationId); // Haetaan dokumentti ID:n perusteella
+      await updateDoc(observationRef, updatedData); // Päivitetään tiedot
+      console.log("Observation updated successfully!");
+  } catch (e) {
+      console.error("Error updating observation: ", e);
+  }
+};
+
+export { db, saveObservation, getObservation, updateObservation };
