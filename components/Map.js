@@ -36,25 +36,6 @@ export default function Map() {
     });
   }
 
-//Hakee osoitteen käyttäen Google Maps Geocodin API:a ja koordinaatteja
-  const getLocation = async (latitude, longitude) => {
-    try {
-      const apiKey = 'AIzaSyAZ2bqA050cPNhwymTgebQqVZGaZ3rD724';  
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
-      const data = await response.json();
-
-      if (data.status === 'OK' && data.results.length > 0) { //tarkistetaan onko API kutsu käsitellyt pyynnön onnistuneesti ja palauttanut tuloksia
-        const address = data.results[0].formatted_address; //kun tulokset on löytyneet, poimitaan ensimmäinen tulos ja muotoillaan siitä osoite. results on osoitteet sisältävä taulukko
-       //formatted_address on valmis osoite
-        Alert.alert('Address found:', address);
-      } else {
-        Alert.alert('No address found for these coordinates');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Could not fetch address');
-    }
-  }
-
   // Käynnistetään sijainnin haku kun komponentti on ladattu
   useEffect(() => {
     gePositioning();
@@ -145,9 +126,9 @@ export default function Map() {
             }}
             zIndex={1} //määrittää järjestyksen, jotta saadaan iconi näkyviin
             
-            title={observation.name}//näyttää tietolaatikon, jossa on nimi
-            description={observation.description}//ja havintoteksti
-            onPress={()=>{
+           // title={observation.name}//näyttää tietolaatikon, jossa on nimi
+            //description={observation.description}//ja havintoteksti
+            onPress={()=>{ //Avaa modalin, joka näyttää tallannetun havainnon tiedot
               setSelectObservation(observation);
               setModalVisible(false);
               setEditModalVisible(true);

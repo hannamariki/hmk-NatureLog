@@ -1,6 +1,5 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"; // kirjautuminen ja registeröityminen
 import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -18,33 +17,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); 
 const db = getFirestore(app);
 
 
-
-
-//Rekisteröityminen
-export const registerUser = async (email, password) => { //asynkroninen funktio, jolla luodaan uusi käyttäjä
-    try {
-        const authenticatedUser = await createUserWithEmailAndPassword(auth, email, password); //await ottaa yhteyden firebase metodiin, joka luo uuden käyttäjätilin sähköpostilla ja salasanan https://firebase.google.com/docs/auth/android/start?hl=en&authuser=0#sign_up_new_users
-        const user = authenticatedUser.user; //sisältää käyttäjän tiedot
-        console.log("User registered:", user);
-    }catch (error){
-        console.error("Error registering user:", error.message);
-    }
-};
-
-//Kirjautuminen
-const loginUser = async (email, password) => {//kirjaa käyttäjän sisään sähköpostilla ja salasanalla
-    try{
-        const authenticatedUser = await signInWithEmailAndPassword(auth, email, password); // tarkastetaan onko käyttäjällä oikea salasana ja sähköposti, jos on, antaa kirjautua sisään https://firebase.google.com/docs/auth/android/password-auth?hl=en#sign_in_a_user_with_an_email_address_and_password
-        const user = authenticatedUser.user;
-        console.log("User logged in:", user);
-    }catch (error){
-        console.error("Error logging in user:", error.message);
-    }
-};
 
 //Havainnon tallentaminen Cloud Firestoreen
 const saveObservation = async (observation) => { //tallentaa uuden havainnon 
@@ -91,4 +66,4 @@ const saveObservation = async (observation) => { //tallentaa uuden havainnon
     }
 }; //Get multiple documents from a collection avulla pitäisi näkyä kaikki havainnot kartalla, ei vain yksi havainto
 
-export { auth, db, saveObservation, getObservation };
+export { db, saveObservation, getObservation };
