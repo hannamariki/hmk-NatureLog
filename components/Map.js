@@ -6,7 +6,8 @@ import * as Location from 'expo-location';
 import { IconButton, Modal } from 'react-native-paper';
 import AddObservation from './AddObservation'; 
 import { saveObservation, getObservation } from './firebase';
-import EditObservation from './EditObservation';
+//import EditObservation from './EditObservation';
+import ShowObservation from './ShowObservation';
 
 export default function Map() {
   const [address, setAddress] = useState({ //puhelimen sijainnin koordinaatit alustettu 
@@ -16,7 +17,7 @@ export default function Map() {
   const [positioning, setPositioning] = useState(null); //tila, jonne tallennetaan sijainnin tarkemmat tiedot 
   const [isModalVisible, setModalVisible] = useState(false);//AddObservationi modalain tila
   const [observations, setObservations] = useState([]); //tila havaintojen tallentamiseen
-  const [isEditModalVisible, setEditModalVisible] = useState(false); //EditObservation modalin tila
+  const [isShowModalVisible, setShowModalVisible] = useState(false);
   const [selectObservation, setSelectObservation] = useState(null);
 
   // Hakee sijainnin ja asettaa sen tilaan
@@ -131,7 +132,7 @@ export default function Map() {
             onPress={()=>{ //Avaa modalin, joka näyttää tallannetun havainnon tiedot
               setSelectObservation(observation);
               setModalVisible(false);
-              setEditModalVisible(true);
+              setShowModalVisible(true);
             }}
             >
 
@@ -172,13 +173,13 @@ export default function Map() {
 
         <Modal
 
-          visible={isEditModalVisible}
-          onDismiss={() => setEditModalVisible(false)}
+          visible={isShowModalVisible}
+          onDismiss={() => setShowModalVisible(false)}
           animationType="slide"
           >
-        <EditObservation
-        visible={isEditModalVisible}
-        onClose={() => setEditModalVisible(false)}
+        <ShowObservation
+        visible={isShowModalVisible}
+        onClose={() => setShowModalVisible(false)}
         observation={selectObservation}
         />
            </Modal>
