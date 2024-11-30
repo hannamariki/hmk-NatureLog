@@ -6,6 +6,7 @@ import { Paragraph, Button } from 'react-native-paper';
 const EditObservation = ({visible, observation, onClose}) => {
 if(!observation) return null;
 
+
 return (
 <Modal visible={visible} transparent={true} animationType="slide">
     <View style={styles.modalOverlay}>
