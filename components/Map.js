@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react'; 
-import { StyleSheet, View, Alert, TextInput, Button, Text } from 'react-native'; 
+import { View, Alert, Text } from 'react-native'; 
 import MapView, { Marker } from 'react-native-maps'; 
 import * as Location from 'expo-location';
 import { IconButton, Modal } from 'react-native-paper';
@@ -16,7 +16,7 @@ export default function Map() {
   });
   const [positioning, setPositioning] = useState(null); //tila, jonne tallennetaan sijainnin tarkemmat tiedot 
   const [isModalVisible, setModalVisible] = useState(false);//AddObservationi modalain tila
-  const [observations, setObservations] = useState([]); //tila havaintojen tallentamiseen
+  const [observations, setObservations] = useState([]); 
   const [isShowModalVisible, setShowModalVisible] = useState(false);
   const [selectObservation, setSelectObservation] = useState(null);
 
@@ -53,7 +53,7 @@ export default function Map() {
        }
       };
       loadObservations();
-    }, []); //hataan havainto vain kerran
+    }, []); //haetaan havainto vain kerran
   
 
 
@@ -91,8 +91,8 @@ export default function Map() {
       setModalVisible(false);
     } catch (error) {
       Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + error.message);
-    } //kutsutaan firebase.js komponentissa olevaa tallennustilaa
-    setModalVisible(false); 
+    } setModalVisible(false); 
+    
   };
 
   return (
@@ -128,6 +128,7 @@ export default function Map() {
               longitude: observation.longitude,
             }}
             zIndex={1} //määrittää järjestyksen, jotta saadaan iconi näkyviin
+
             onPress={()=>{ //Avaa modalin, joka näyttää tallannetun havainnon tiedot
               setSelectObservation(observation);
               setModalVisible(false);
@@ -136,7 +137,7 @@ export default function Map() {
             >
 
               <View>
-                <Text style={{ fontSize: 25 }}>{observation.icon}</Text>
+                <Text style={{ fontSize: 27 }}>{observation.icon}</Text>
                 
               </View>
             </Marker>

@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { deleteObservation} from './firebase';
 
 
-const ShowObservation = ({visible, observation, onClose}) => {
+const ShowObservation = ({visible, observation, onClose }) => {
     const navigation = useNavigation();
 
 if(!observation) return null; //tarkastetaan onko observation määritelty
@@ -18,12 +18,12 @@ const handleDeleteObservation = async () => {
             return;
         }
         await deleteObservation(observation.id); // Kutsutaan oikeaa funktiota
-        console.log('Havainto poistettu');
         onClose();  // Suljetaan modal, jos poisto onnistuu
     } catch (e) {
         console.error('Virhe poistaessa havaintoa:', e);
     }
 };
+
 
 return (
 <Modal visible={visible} transparent={true} animationType="slide">
@@ -34,8 +34,6 @@ return (
             <Paragraph>Ikoni:</Paragraph> 
             <Text style={styles.descriptionText}>{observation.icon}</Text>
             <Paragraph>Kuvaus:</Paragraph>
-            <Text style={styles.descriptionText}> {observation.description}</Text>
-            <Paragraph>Kansio:</Paragraph>
             <Text style={styles.descriptionText}> {observation.folder}</Text>
             <Paragraph>Koordinaatit:</Paragraph>
             <Text style={styles.descriptionText}>{observation.latitude}, {observation.longitude}</Text>
@@ -43,7 +41,7 @@ return (
             <Button
                 mode="text"
                 onPress={() => { 
-                navigation.navigate('EditObservation', {observation, onSave, onClose});
+                navigation.navigate('EditObservation', {observation});
                 }}
                 >
                 Muokkaa

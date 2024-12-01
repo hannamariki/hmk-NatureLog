@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, doc,  deleteDoc } from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc,  deleteDoc} from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,37 +22,36 @@ const db = getFirestore(app);
 
 
 //Havainnon tallentaminen Cloud Firestoreen
-const saveObservation = async (folder, observation) => { //tallentaa uuden havainnon 
-    try {
-      const folderRef = collection(db, 'folders', folder, 'observations'); // Accessing specific folder's sub-collection
-      console.log("folderRef:", folderRef);
-      const docRef = await addDoc(folderRef, {
-            name: observation.name,
-            description: observation.description,
-            icon: observation.icon,
-            folder: observation.folder,
-            latitude: observation.latitude, // Lisätään koordinaatit
-            longitude: observation.longitude, 
-        
-        }); 
-        console.log("Name:", observation.name);
-        console.log("Icon:", observation.icon);
-        console.log("Description:", observation.description);
-        console.log("Folder:", observation.folder);
-        console.log("Latitude:", observation.latitude);
-        console.log("Longitude:", observation.longitude);
-        // addDoc lisää uuden dokumentin tietokantaan ja luo automaattisesti id:n dokumentille https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
-        //collection(db, "observations") tämä määrittää mihin kokoelmaan dokumentti lisätään, ja mikä on kokoelman nimi ("observations")
-        //observation sisältää havaintotiedot
-
-        
-        console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-        console.error("Error adding document: ", e);
-        Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + e.message);
-        throw new Error("Tallennus epäonnistui");
-      }
-    };
+const saveObservation = async (observation) => {
+  try {
+    if (observation.id) {
+      // Jos observationilla on id, päivitetään olemassa oleva dokumentti
+      const observationRef = doc(db, "observations", observation.id); // Haetaan dokumentti ID:n perusteella
+      await updateDoc(observationRef, {
+        name: observation.name,
+        description: observation.description,
+        icon: observation.icon,
+        latitude: observation.latitude,
+        longitude: observation.longitude,
+      });
+      console.log("Havainto päivitetty onnistuneesti!");
+    } else {
+      // Jos id:tä ei ole, lisätään uusi havainto
+      const docRef = await addDoc(collection(db, "observations"), {
+        name: observation.name,
+        description: observation.description,
+        icon: observation.icon,
+        latitude: observation.latitude,
+        longitude: observation.longitude,
+      });
+      console.log("Uusi havainto lisätty, id: ", docRef.id);
+    }
+  } catch (e) {
+    console.error("Virhe tallentamisessa: ", e);
+    Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + e.message);
+    throw new Error("Tallennus epäonnistui");
+  }
+};
 
   //Havaintojen tuominen Cloud Firestoresta
   const getObservation = async () => {
@@ -74,27 +73,6 @@ const saveObservation = async (folder, observation) => { //tallentaa uuden havai
     }
 }; //Get multiple documents from a collection avulla pitäisi näkyä kaikki havainnot kartalla, ei vain yksi havainto
 
-export const saveFolder = async (folderName) => {
-  try {
-    const docRef = await addDoc(collection(db, 'folders'), { name: folderName });
-    console.log("Folder saved with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error saving folder: ", e);
-  }
-};
-
-// Hae kaikki kansiot Firebase-tietokannasta
-export const getFolders = async () => {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'folders'));
-    const folders = querySnapshot.docs.map(doc => doc.data().name);
-    console.log("Fetched folders data:", folders); 
-    return folders;  
-  } catch (e) {
-    console.error("Error fetching folders: ", e);
-    return [];  
-  }
-};
 
 //Olemassa olevien havaintojen päivittäminen
 const updateObservation = async (observationId, updatedData) => {
