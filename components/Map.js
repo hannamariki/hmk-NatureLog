@@ -28,7 +28,7 @@ export default function Map() {
       return;
     }
     const positioning = await Location.getCurrentPositionAsync({}); //hakee laitteen nykyisen sijainnin
-    setPositioning(positioning.coords);//tallennetaan koordinaatit positioning tilaan
+    setPositioning(positioning.coords)
 
     // Päivittää nykyisen sijainnin koordinaatit
     setAddress({
@@ -88,7 +88,7 @@ export default function Map() {
         latitude: address.latitude,
         longitude: address.longitude,
       });
-      setModalVisible(false); // Sulje modal onnistuneen tallennuksen jälkeen
+      setModalVisible(false);
     } catch (error) {
       Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + error.message);
     } //kutsutaan firebase.js komponentissa olevaa tallennustilaa
@@ -128,9 +128,6 @@ export default function Map() {
               longitude: observation.longitude,
             }}
             zIndex={1} //määrittää järjestyksen, jotta saadaan iconi näkyviin
-            
-           // title={observation.name}//näyttää tietolaatikon, jossa on nimi
-            //description={observation.description}//ja havintoteksti
             onPress={()=>{ //Avaa modalin, joka näyttää tallannetun havainnon tiedot
               setSelectObservation(observation);
               setModalVisible(false);

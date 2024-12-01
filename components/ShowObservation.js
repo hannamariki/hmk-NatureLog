@@ -3,21 +3,27 @@ import {Modal, Text, View} from 'react-native';
 import {styles} from './Styles';
 import { Paragraph, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { deleteObservation} from './firebase';
 
 
 const ShowObservation = ({visible, observation, onClose}) => {
     const navigation = useNavigation();
 
-if(!observation) return null;
+if(!observation) return null; //tarkastetaan onko observation määritelty
 
-const onDelete = async (observationId) => {
+const handleDeleteObservation = async () => {
     try {
-      await deleteObservation(observationId); 
-      console.log('Havainto poistettu');
+        if (typeof observation.id !== 'string') {
+            console.error('Observation ID must be a string');
+            return;
+        }
+        await deleteObservation(observation.id); // Kutsutaan oikeaa funktiota
+        console.log('Havainto poistettu');
+        onClose();  // Suljetaan modal, jos poisto onnistuu
     } catch (e) {
-      console.error('Virhe poistaessa havaintoa:', e);
+        console.error('Virhe poistaessa havaintoa:', e);
     }
-  };
+};
 
 return (
 <Modal visible={visible} transparent={true} animationType="slide">
@@ -37,12 +43,12 @@ return (
             <Button
                 mode="text"
                 onPress={() => { 
-                navigation.navigate('EditObservation', { id: observation});
+                navigation.navigate('EditObservation', {observation, onSave, onClose});
                 }}
                 >
                 Muokkaa
                 </Button>
-            <Button mode="outlined" onPress={() => onDelete(observation.id)}>
+            <Button mode="outlined" onPress={handleDeleteObservation}>
                 Poista
             </Button>
             <Button mode="text" onPress={onClose}>

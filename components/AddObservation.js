@@ -25,66 +25,82 @@ const iconOptions = [
 
 
 const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => {
-  const [name, setName] = useState('');  // Havainnon nimi
-  const [icon, setIcon] = useState('Lisää kuvake'); // Oletusikoni (eläimen jälki)
-  const [description, setDescription] = useState('');  // Kuvaus
+  const [name, setName] = useState('');  
+  const [icon, setIcon] = useState('Lisää kuvake'); 
+  const [description, setDescription] = useState(''); 
   const [iconModalVisible, setIconModalVisible] = useState(false); // Ikonilistan ikkunavalikko
   const [descriptionModalVisible, setDescriptionModalVisible] = useState(false);
-  const [folder, setFolder] = useState(''); // Kansio
+  const [folder, setFolder] = useState(''); 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [newFolder, setNewFolder] = useState('');
   const [existingFolders, setExistingFolders] = useState([]);
 
 
   const handleSave = async () => {
-    if (!latitude || !longitude) {
-      Alert.alert('Virhe', 'Koordinaatit puuttuvat');
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+        Alert.alert('Virhe', 'Koordinaatit eivät ole kelvollisia');
+        return;
+    }
+
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      Alert.alert('Virhe', 'Havainnon nimi on pakollinen kenttä.');
       return;
     }
 
-    const observation = { 
-      name,
-      icon : icon || '⭕', 
-      description, 
-      folder, 
-      latitude, 
-      longitude };
+    const observation = {
+      name: name || 'Untitled Observation', 
+      icon: icon || '⭕',
+      description: description || '',
+      folder: folder || 'Default',
+      latitude: latitude || 0,
+      longitude: longitude || 0,
+    };
 
-    try{
-      await saveObservation(observation);
-      console.log("Observation saved")
-      onSave(observation);  // Kutsutaan onSave-funktiota (Map.js-komponentista)
-      onClose();
-    }catch (e) {
-      console.error("Error saving observation: ", e);
-    }
+      try {
+        console.log("Saving observation under folder:", folder); 
+        await saveObservation(folder, observation);
+        console.log("Observation saved under folder:", folder);
+        onSave(observation);  
+        onClose();
+      } catch (e) {
+        console.error("Error saving observation: ", e);
+        Alert.alert('Virhe', 'Havaintoa ei voitu tallentaa: ' + e.message);
+      }
     
-    setIconModalVisible(false); // Sulje kuvakkeen valinta
-    setDescriptionModalVisible(false);
-    setFolderModalVisible(false); 
+      console.log("Type of name:", typeof name)
+      console.log("Name before saving:", name, typeof name);
+      setIconModalVisible(false); // Sulje kuvakkeen valinta
+      setDescriptionModalVisible(false);
+      setFolderModalVisible(false); 
   };
 
+  
     // Lataa kansiot Firebase-tietokannasta, kun komponentti ladataan
     useEffect(() => {
       const fetchFolders = async () => {
         const folders = await getFolders();
+        console.log("Fetched folders:", folders);  
         setExistingFolders(folders);
       };
-  
+    
       fetchFolders();
     }, []); // Lataa kansiot vain kerran
 
   const handleFolder = async () => {
-    if (newFolder){
+    if (newFolder) {
+      if (typeof newFolder !== 'string') {
+        console.error("New folder name must be a string");
+        return;
+      }
       try {
         await saveFolder(newFolder);
-      const updatedFolders = [...existingFolders, newFolder];
-      setExistingFolders(updatedFolders);
-      setFolder(newFolder);
-      setNewFolder('');
-      setFolderModalVisible(false); //suljetaan kansio
-    } catch (e) {
-      console.error("Error saving folder: ", e);
+        const updatedFolders = [...existingFolders, newFolder];
+        setExistingFolders(updatedFolders);
+        setFolder(newFolder); 
+        setNewFolder('');  
+        setFolderModalVisible(false); 
+      } catch (e) {
+        console.error("Error saving folder: ", e);
     }
 
     }
@@ -172,7 +188,7 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => 
                   style={styles.iconItem}
                   onPress={() => {
                     setIcon(iconOption.value);
-                    setIconModalVisible(false); // Sulkee valintaikkunan kun ikoni on valittu
+                    setIconModalVisible(false); 
                   }}
                 >
                   <Text style={styles.icon}>{iconOption.value}</Text>
@@ -220,15 +236,19 @@ const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => 
           <View style={styles.iconList}>
             {existingFolders.map((folderName, index) => (
               <TouchableRipple
-                key={index}
-                style={styles.iconItem}
-                onPress={() => {
-                  setFolder(folderName); // Asetetaan valittu kansio
-                  setFolderModalVisible(false); // Suljetaan valintaikkuna
-                }}
-              >
-                <Text style={styles.descriptionText}>{folderName}</Text>
-              </TouchableRipple>
+              key={index}
+              style={styles.iconItem}
+              onPress={() => {
+                if (typeof folderName === 'string') {
+                  setFolder(folderName);
+                  setFolderModalVisible(false); 
+              } else {
+                  console.error('Invalid folder name');
+              }
+              }}
+            >
+              <Text style={styles.descriptionText}>{folderName}</Text>
+            </TouchableRipple>
             ))}
           </View>
 

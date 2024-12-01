@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc,  deleteDoc } from "firebase/firestore"; // tietojen tallentaminen ja hakeminen tietkokannsta 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,17 +22,25 @@ const db = getFirestore(app);
 
 
 //Havainnon tallentaminen Cloud Firestoreen
-const saveObservation = async (observation) => { //tallentaa uuden havainnon 
+const saveObservation = async (folder, observation) => { //tallentaa uuden havainnon 
     try {
-        const docRef = await addDoc(collection(db, "observations"), {
+      const folderRef = collection(db, 'folders', folder, 'observations'); // Accessing specific folder's sub-collection
+      console.log("folderRef:", folderRef);
+      const docRef = await addDoc(folderRef, {
             name: observation.name,
             description: observation.description,
             icon: observation.icon,
             folder: observation.folder,
             latitude: observation.latitude, // Lisätään koordinaatit
             longitude: observation.longitude, 
-
+        
         }); 
+        console.log("Name:", observation.name);
+        console.log("Icon:", observation.icon);
+        console.log("Description:", observation.description);
+        console.log("Folder:", observation.folder);
+        console.log("Latitude:", observation.latitude);
+        console.log("Longitude:", observation.longitude);
         // addDoc lisää uuden dokumentin tietokantaan ja luo automaattisesti id:n dokumentille https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
         //collection(db, "observations") tämä määrittää mihin kokoelmaan dokumentti lisätään, ja mikä on kokoelman nimi ("observations")
         //observation sisältää havaintotiedot
@@ -80,10 +88,11 @@ export const getFolders = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'folders'));
     const folders = querySnapshot.docs.map(doc => doc.data().name);
-    return folders; // Palauta kansioiden nimet
+    console.log("Fetched folders data:", folders); 
+    return folders;  
   } catch (e) {
     console.error("Error fetching folders: ", e);
-    return [];
+    return [];  
   }
 };
 
@@ -97,5 +106,16 @@ const updateObservation = async (observationId, updatedData) => {
       console.error("Error updating observation: ", e);
   }
 };
+const deleteObservation = async (observationId) => {
+  try {
+    // Poista havainto Firestore-tietokannasta
+    await deleteDoc(doc(db, "observations", observationId)); 
+    console.log("Havainto poistettu onnistuneesti!");
+  } catch (error) {
+    console.error("Virhe poistaessa havaintoa: ", error);
+    throw error; // Heitetään virhe, jotta se voidaan käsitellä komponentissa
+  }
+};
 
-export { db, saveObservation, getObservation, updateObservation };
+
+export { db, saveObservation, getObservation, updateObservation, deleteObservation  };

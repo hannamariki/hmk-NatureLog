@@ -6,6 +6,7 @@ import {styles} from './Styles';
 
 
 
+
 const iconOptions = [
     { label: 'Lintu', value: '🦆' },
     { label: 'Jänis', value: '🐇' },
@@ -24,13 +25,13 @@ const iconOptions = [
   ];
 
 const EditObservation = ({ navigation, route, isVisible}) => {
-    const { observation, onSave, onClose } = route.params; 
+    const { observation, onSave, onClose} = route.params; 
     const [name, setName] = useState(observation.name);  // Havainnon nimi
     const [icon, setIcon] = useState(observation.icon); // Oletusikoni (eläimen jälki)
     const [description, setDescription] = useState(observation.description);  // Kuvaus
     const [iconModalVisible, setIconModalVisible] = useState(false); // Ikonilistan ikkunavalikko
     const [descriptionModalVisible, setDescriptionModalVisible] = useState(false);
-    const [folder, setFolder] = useState(observation.folder); // Kansio
+    const [folder, setFolder] = useState(observation.folder || ''); // Kansio
     const [folderModalVisible, setFolderModalVisible] = useState(false);
     const [newFolder, setNewFolder] = useState('');
     const [existingFolders, setExistingFolders] = useState(['']);
@@ -38,16 +39,30 @@ const EditObservation = ({ navigation, route, isVisible}) => {
     const longitude = observation.longitude;
 
     useEffect(() => {
-        navigation.setParams({ onSave: handleSave });
-      }, [handleSave]);
+        navigation.setOptions({ onSave: handleSave });
+      }, [navigation]);
 
+      //varmistetaan että syötetyt tiedot ovat oikeassa muodossa
+      const handleSave = async () => {
+        if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+            Alert.alert('Virhe', 'Koordinaatit eivät ole kelvollisia');
+            return;
+        }
+   
+        if (typeof folder !== 'string') {
+            console.error('Folder must be a string');
+            return;
+        }
 
-const handleSave = async () => {
-    if (!latitude || !longitude){
-        Alert.alert('Virhe', 'Koordinaatteja ei ole');
-        return;
-    }
-    
+        if (typeof name !== 'string' || 
+            typeof icon !== 'string' || 
+            typeof description !== 'string' || 
+            typeof folder !== 'string' || 
+            typeof latitude !== 'number' || 
+            typeof longitude !== 'number') {
+            Alert.alert('Virhe', 'Yksi tai useampi kenttä ei ole oikeaa tyyppiä.');
+            return;
+        }
 
     const updateObservation = {
         ...observation,
@@ -81,20 +96,21 @@ const handleSave = async () => {
         fetchFolders();
       }, []); // Lataa kansiot vain kerran
   
-    const handleFolder = async () => {
-      if (newFolder){
-        try {
-          await saveFolder(newFolder);
-        const updatedFolders = [...existingFolders, newFolder];
-        setExistingFolders(updatedFolders);
-        setFolder(newFolder);
-        setNewFolder('');
-        setFolderModalVisible(false); //suljetaan kansio
-      } catch (e) {
-        console.error("Error saving folder: ", e);
-      }
-  
-      }
+      const handleFolder = async () => {
+        if (newFolder && typeof newFolder === 'string') {
+            try {
+                await saveFolder(newFolder);
+                const updatedFolders = [...existingFolders, newFolder];
+                setExistingFolders(updatedFolders);
+                setFolder(newFolder);
+                setNewFolder('');
+                setFolderModalVisible(false); 
+            } catch (e) {
+                console.error("Error saving folder: ", e);
+            }
+        } else {
+            console.error('Folder name must be a string');
+        }
     };
   
   return (
@@ -165,7 +181,6 @@ const handleSave = async () => {
             setIconModalVisible(false);
             setFolderModalVisible(false);
         
-            // Navigoi suoraan 'Map' näkymään
             navigation.navigate('Map');
           }}
             >
@@ -188,7 +203,7 @@ const handleSave = async () => {
                   style={styles.iconItem}
                   onPress={() => {
                     setIcon(iconOption.value);
-                    setIconModalVisible(false); // Sulkee valintaikkunan kun ikoni on valittu
+                    setIconModalVisible(false); 
                   }}
                 >
                   <Text style={styles.icon}>{iconOption.value}</Text>
@@ -241,8 +256,12 @@ const handleSave = async () => {
                 key={index}
                 style={styles.iconItem}
                 onPress={() => {
-                  setFolder(folderName); // Asetetaan valittu kansio
-                  setFolderModalVisible(false); // Suljetaan valintaikkuna
+                    if (typeof folderName === 'string') {
+                        setFolder(folderName);
+                        setFolderModalVisible(false); 
+                    } else {
+                        console.error('Invalid folder name');
+                    }
                 }}
               >
                 <Text style={styles.icon}>{folderName}</Text>
