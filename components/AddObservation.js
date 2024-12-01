@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput, Button, Paragraph, TouchableRipple, IconButton } from 'react-native-paper';
-import { View, Text, Modal } from 'react-native';
+import { View, Text, Modal, Alert } from 'react-native';
 import { saveObservation} from './firebase';
 import {styles} from './Styles';
 
@@ -24,7 +24,7 @@ const iconOptions = [
 
 
 
-const AddObservation = ({ onSave, onClose, isVisible, latitude, longitude }) => {
+const AddObservation = ({ onClose, isVisible, latitude, longitude }) => {
   const [name, setName] = useState('');  
   const [icon, setIcon] = useState('Lisää kuvake'); 
   const [description, setDescription] = useState(''); 

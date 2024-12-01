@@ -165,13 +165,8 @@ const EditObservation = ({ navigation, route, isVisible}) => {
                   style={[styles.descriptionInput]}
                   />
                   <Button mode="contained" onPress={() => setDescriptionModalVisible(false)}>
-                    Tallenna
+                    Sulje
                     </Button>
-                  <Button mode="text" onPress={() => {setDescriptionModalVisible(false)
-                    navigation.goBack();
-                  }}>
-                    Peruuta
-                </Button>
               </View>
             </View>
         </Modal>

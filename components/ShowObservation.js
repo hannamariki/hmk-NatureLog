@@ -34,7 +34,7 @@ return (
             <Paragraph>Ikoni:</Paragraph> 
             <Text style={styles.descriptionText}>{observation.icon}</Text>
             <Paragraph>Kuvaus:</Paragraph>
-            <Text style={styles.descriptionText}> {observation.folder}</Text>
+            <Text style={styles.descriptionText}> {observation.description}</Text>
             <Paragraph>Koordinaatit:</Paragraph>
             <Text style={styles.descriptionText}>{observation.latitude}, {observation.longitude}</Text>
 
